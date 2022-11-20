@@ -5,6 +5,7 @@ import com.project.course.model.Course;
 import com.project.course.service.CourseService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -22,6 +23,7 @@ public class AdminController {
      * @return
      */
     @PostMapping("/create-update")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public ResponseEntity<Course> courseCreateOrUpdate(@RequestBody CourseRequestDto courseRequestDto)
     {
         return ResponseEntity.ok(courseService.courseCreateOrUpdate(courseRequestDto));
@@ -33,6 +35,7 @@ public class AdminController {
      * @return
      */
     @PostMapping("/delete")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public ResponseEntity<?> deactivateCourse(@RequestBody CourseRequestDto courseRequestDto)
     {
         return ResponseEntity.ok(courseService.deactivateCourse(courseRequestDto));

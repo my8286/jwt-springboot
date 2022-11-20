@@ -1,18 +1,20 @@
 package com.project.course.service;
 
+import com.project.course.dto.CompletedCourseDto;
 import com.project.course.dto.CourseRequestDto;
 import com.project.course.enums.Status;
 import com.project.course.model.Course;
+import com.project.course.model.User;
 import com.project.course.repository.CourseRepository;
+import com.project.course.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import javax.swing.text.html.Option;
+import java.util.*;
 
 @Service
 @Slf4j
@@ -20,6 +22,9 @@ public class CourseService {
 
     @Autowired
     CourseRepository courseRepository;
+
+    @Autowired
+    UserRepository userRepository;
 
     public Course courseCreateOrUpdate(CourseRequestDto courseRequestDto) {
         Course course = new Course();
@@ -118,5 +123,29 @@ public class CourseService {
         else{
             throw new RuntimeException("CourseId not found");
         }
+    }
+
+    public String completeCourseUpdate(CompletedCourseDto completedCourseDto) {
+
+        if(Objects.isNull(completedCourseDto) || Objects.isNull(completedCourseDto.getCourseId()) || Objects.isNull(completedCourseDto.getUserId()))
+        {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"CourseId and userId cannot be null ");
+        }
+        Optional<User> userOptional = userRepository.findById(completedCourseDto.getUserId());
+        if(userOptional.isPresent())
+        {
+            User user=userOptional.get();
+            Optional<Course> courseOptional = courseRepository.findById(completedCourseDto.getUserId());
+            if(courseOptional.isPresent())
+            {
+                Course course=courseOptional.get();
+                Set<Course> courseSet=new HashSet<>();
+                courseSet.add(course);
+                user.setCourse(courseSet);
+                userRepository.save(user);
+            }
+        }
+        return "completed course updated successfully";
+
     }
 }

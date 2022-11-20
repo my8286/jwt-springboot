@@ -45,13 +45,11 @@ public class UserService implements UserDetailsService {
 				.collect(Collectors.toList());
 		return authorities;
 	}
-
-
 	
-	public User registerUser(UserDto userDto) {
+	public String registerUser(UserDto userDto) {
 		User userOptional = userRepository.findByUsername(userDto.getUsername());
 		if (!Objects.isNull(userOptional)) {
-			return userOptional;
+			return "username already exist";
 		}
 		User user = new User();
 
@@ -59,13 +57,10 @@ public class UserService implements UserDetailsService {
 		Set<Role> roleSet = new HashSet<>();
 		roleSet.add(role);
 
-//		if(userDto.getUsername().split("@")[1].equals("admin.edu")){
-//			role = roleService.findByName("ADMIN");
-//			roleSet.add(role);
-//		}
 		user.setUsername(userDto.getUsername());
 		user.setPassword(bcryptEncoder.encode(userDto.getPassword()));
 		user.setRoles(roleSet);
-		return userRepository.save(user);
+		userRepository.save(user);
+		return "user registered successfully";
 	}
 }

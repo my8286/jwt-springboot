@@ -33,7 +33,7 @@ public class SuperAdminController {
      * @return
      */
     @PostMapping("/update/status")
-    @PreAuthorize("hasRole('ROLE_SUPER_ADMIN')")
+    @PreAuthorize("hasAuthority('ROLE_SUPER_ADMIN')")
     public ResponseEntity<?> updateStatus(@RequestBody CourseRequestDto courseRequestDto)
     {
         return ResponseEntity.ok(courseService.updateStatus(courseRequestDto));

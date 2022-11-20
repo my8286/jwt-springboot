@@ -37,4 +37,14 @@ public class User {
     @Getter
     private Set<Role> roles = new HashSet<>();
 
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "users_course_completed",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "course_id")
+    )
+    @Setter
+    @Getter
+    private Set<Course> course = new HashSet<>();
+
 }
