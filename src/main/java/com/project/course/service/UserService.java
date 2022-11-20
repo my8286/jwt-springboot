@@ -1,17 +1,21 @@
 package com.project.course.service;
 
+import com.project.course.enums.Roles;
+import com.project.course.model.Role;
 import com.project.course.repository.UserRepository;
 import com.project.course.model.User;
 import com.project.course.dto.UserDto;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Objects;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService implements UserDetailsService {
@@ -22,6 +26,9 @@ public class UserService implements UserDetailsService {
 	@Autowired
 	private PasswordEncoder bcryptEncoder;
 
+	@Autowired
+	private RoleService roleService;
+
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 		User user = userRepository.findByUsername(username);
@@ -29,18 +36,36 @@ public class UserService implements UserDetailsService {
 			throw new UsernameNotFoundException("User not found with username: " + username);
 		}
 		return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(),
-				new ArrayList<>());
+				getRoles(user));
 	}
+
+	public List<GrantedAuthority> getRoles(User user){
+		List<GrantedAuthority> authorities = user.getRoles().stream()
+				.map(role -> new SimpleGrantedAuthority(role.getName().name()))
+				.collect(Collectors.toList());
+		return authorities;
+	}
+
+
 	
-	public User save(UserDto user) {
-		User userOptional=userRepository.findByUsername(user.getUsername());
-		if(!Objects.isNull(userOptional))
-		{
+	public User registerUser(UserDto userDto) {
+		User userOptional = userRepository.findByUsername(userDto.getUsername());
+		if (!Objects.isNull(userOptional)) {
 			return userOptional;
 		}
-		User newUser = new User();
-		newUser.setUsername(user.getUsername());
-		newUser.setPassword(bcryptEncoder.encode(user.getPassword()));
-		return userRepository.save(newUser);
+		User user = new User();
+
+		Role role = roleService.findByName(Roles.ROLE_USER);
+		Set<Role> roleSet = new HashSet<>();
+		roleSet.add(role);
+
+//		if(userDto.getUsername().split("@")[1].equals("admin.edu")){
+//			role = roleService.findByName("ADMIN");
+//			roleSet.add(role);
+//		}
+		user.setUsername(userDto.getUsername());
+		user.setPassword(bcryptEncoder.encode(userDto.getPassword()));
+		user.setRoles(roleSet);
+		return userRepository.save(user);
 	}
 }

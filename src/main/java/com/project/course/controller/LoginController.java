@@ -13,6 +13,9 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @CrossOrigin(origins = "http://localhost:4200")
 @RestController
 public class LoginController {
@@ -46,6 +49,11 @@ public class LoginController {
 
 		final String token = jwtTokenUtil.generateToken(userDetails);
 //		String role=userRepository.findByUsername(authenticationRequest.getUsername()).getRole().toString();
+		List<String> roles = userDetails.getAuthorities().stream()
+				.map(item -> item.getAuthority())
+				.collect(Collectors.toList());
+
+		System.out.println(roles);
 		return ResponseEntity.ok(new JwtResponse(token));
 	}
 

@@ -2,6 +2,7 @@ package com.project.course.model;
 
 
 
+import com.project.course.enums.Roles;
 import lombok.*;
 
 import javax.persistence.*;
@@ -17,10 +18,10 @@ public class Role {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(columnDefinition = "SET('ROLE_ADMIN','ROLE_USER','PUBLISHED') default 'ROLE_USER'")
+    @Column(columnDefinition = "SET('ROLE_ADMIN','ROLE_USER','ROLE_SUPER_ADMIN') default 'ROLE_USER'")
     @Enumerated(EnumType.STRING)
     @Getter
     @Setter
-    private com.project.course.enums.Role role;
+    private Roles name;
 
 }

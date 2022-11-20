@@ -22,6 +22,6 @@ public class RegistrationController {
      */
     @RequestMapping(value = "/register", method = RequestMethod.POST)
     public ResponseEntity<?> saveUser(@RequestBody UserDto userDto) throws SQLException {
-        return ResponseEntity.ok(userDetailsService.save(userDto));
+        return ResponseEntity.ok(userDetailsService.registerUser(userDto));
     }
 }
